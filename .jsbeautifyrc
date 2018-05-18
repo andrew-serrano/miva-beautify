@@ -1,13 +1,13 @@
 {
-  indent_with_tabs: true,
-  max_preserve_newlines: 2,
-  preserve_newlines: true,
-  keep_array_indentation: true,
-  break_chained_methods: true,
-  wrap_line_length: 120,
-  end_with_newline: true,
-  brace_style: "collapse,preserve-inline",
-  unformatted: [
+  "indent_with_tabs": true,
+  "max_preserve_newlines": 2,
+  "preserve_newlines": true,
+  "keep_array_indentation": true,
+  "break_chained_methods": true,
+  "wrap_line_length": 120,
+  "end_with_newline": true,
+  "brace_style": "collapse,preserve-inline",
+  "unformatted": [
     "a",
     "abbr",
     "area",
@@ -74,6 +74,6 @@
     "h3",
     "h4",
     "h5",
-    "h6",
-  ],
+    "h6"
+  ]
 }

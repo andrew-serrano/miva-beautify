@@ -1,1 +1,11 @@
-<mvt:assign name="g.test" value="1" /><mvt:comment> Hello Comment </mvt:comment><p>Hello World</p> Random Text <mvt:if expr="g.test EQ 1"><mvt:assign name="g.test" value="1" /><mvt:if expr="g.test EQ 2"><mvt:assign name="g.test" value="3" /></mvt:if></mvt:if><mvt:comment> Hello Comment 2</mvt:comment>
+<mvt:assign name="g.test" value="1" />
+<mvt:comment> Hello Comment </mvt:comment>
+<p>Hello World</p> Random Text
+<mvt:if expr="g.test EQ 1">
+	<mvt:assign name="g.test" value="1" />
+	<mvt:if expr="g.test EQ 2">
+		<mvt:assign name="g.test" value="3" />
+	<mvt:else>
+		<mvt:assign name="g.test" value="3" /></mvt:if>
+</mvt:if>
+<mvt:comment> Hello Comment 2</mvt:comment>

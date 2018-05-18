@@ -1,0 +1,228 @@
+{
+    "name": "miva-beautifier",
+    "displayName": "Miva Beautifier",
+    "description": "Miva Template Lanuage beautifier using HookyQR & js-beautify",
+    "version": "0.0.1",
+    "publisher": "Andrew",
+    "engines": {
+        "vscode": "^1.6.0"
+    },
+    "categories": [
+        "Other",
+        "Languages",
+        "Formatters"
+    ],
+    "activationEvents": [
+        "*"
+    ],
+    "icon": "icon.png",
+    "galleryBanner": {
+        "color": "#e8e030",
+        "theme": "light"
+    },
+    "main": "./extension",
+    "contributes": {
+        "languages": [
+            {
+                "id": "json",
+                "aliases": [
+                    "JSON"
+                ],
+                "filenames": [
+                    ".jsbeautifyrc",
+                    ".jshintrc"
+                ]
+            }
+        ],
+        "jsonValidation": [
+            {
+                "fileMatch": ".jsbeautifyrc",
+                "url": "./schema/beautifyrc.json"
+            }
+        ],
+        "commands": [
+            {
+                "command": "Miva.beautify",
+                "title": "Beautify selection"
+            },
+            {
+                "command": "Miva.beautifyFile",
+                "title": "Beautify file"
+            }
+        ],
+        "configuration": {
+            "type": "object",
+            "title": "Beautify config",
+            "properties": {
+                "beautify.ignore": {
+                    "type": [
+                        "string",
+                        "array"
+                    ],
+                    "items": {
+                        "type": "string"
+                    },
+                    "default": [],
+                    "description": "List of paths to ignore when using VS Code format command, including format on save. Uses glob pattern matching."
+                },
+                "beautify.config": {
+                    "type": [
+                        "string",
+                        "object",
+                        "null"
+                    ],
+                    "default": null,
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "$ref": "http://json.schemastore.org/jsbeautifyrc-nested#"
+                        }
+                    ],
+                    "description": "A path to file or object containing the configuration options for js-beautify. If the .jsbeautifyrc file exists in project root, it overrides this configuration."
+                },
+                "beautify.language": {
+                    "type": "object",
+                    "description": "Link file types to the beautifier type",
+                    "default": {
+                        "js": {
+                            "type": [
+                                "javascript",
+                                "json"
+                            ],
+                            "filename": [
+                                ".jshintrc",
+                                ".jsbeautify"
+                            ]
+                        },
+                        "css": [
+                            "css",
+                            "scss"
+                        ],
+                        "html": [
+                            "htm",
+                            "html",
+                            "mv",
+                            "mvt"
+                        ]
+                    },
+                    "properties": {
+                        "js": {
+                            "type": [
+                                "object",
+                                "array"
+                            ],
+                            "items": {
+                                "type": "string"
+                            },
+                            "description": "Array of language types, or an object containing types, extensions and filenames to associate",
+                            "properties": {
+                                "type": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    },
+                                    "description": "VS Code language name"
+                                },
+                                "ext": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    },
+                                    "description": "File extensions (without the leading dot)"
+                                },
+                                "filename": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    },
+                                    "description": "Full filenames (eg: '.jsbeautifyrc')"
+                                }
+                            }
+                        },
+                        "css": {
+                            "type": [
+                                "object",
+                                "array"
+                            ],
+                            "items": {
+                                "type": "string"
+                            },
+                            "description": "Array of language types, or an object containing types, extensions and filenames to associate",
+                            "properties": {
+                                "type": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    },
+                                    "description": "VS Code language name"
+                                },
+                                "ext": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    },
+                                    "description": "File extensions (without the leading dot)"
+                                },
+                                "filename": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    },
+                                    "description": "Full filenames (eg: '.jsbeautifyrc')"
+                                }
+                            }
+                        },
+                        "html": {
+                            "type": [
+                                "object",
+                                "array"
+                            ],
+                            "items": {
+                                "type": "string"
+                            },
+                            "description": "Array of language types, or an object containing types, extensions and filenames to associate",
+                            "properties": {
+                                "type": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    },
+                                    "description": "VS Code language name"
+                                },
+                                "ext": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    },
+                                    "description": "File extensions (without the leading dot)"
+                                },
+                                "filename": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    },
+                                    "description": "Full filenames (eg: '.jsbeautifyrc')"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "dependencies": {
+        "editorconfig": "0.15.0",
+        "js-beautify": "^1.7.5",
+        "minimatch": "^3.0.4"
+    },
+    "scripts": {
+        "test": "node ./node_modules/vscode/bin/test"
+    },
+    "devDependencies": {
+        "expect.js": "~0.3.1",
+        "mocha": "^3.5.3",
+        "vscode": "^1.1.10"
+    }
+}

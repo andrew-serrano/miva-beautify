@@ -1,0 +1,19 @@
+<mvt:assign name="g.xml" value="'
+	<Provision>
+		<Store code=\"' $ g.Store_Code $ '\">
+			<ScheduledTask_Update task=\"TASK NAME\">
+				<Description>TASK NAME</Description>
+				<Enabled>true</Enabled>
+				<NextRun>
+					<Year>' $ s.dyn_tm_year $ '</Year>
+					<Month>' $ s.dyn_tm_mon $ '</Month>
+					<Day>' $ s.dyn_tm_mday $ '</Day>
+					<Hour>' $ s.dyn_tm_hour $ '</Hour>
+					<Minute>' $ s.dyn_tm_min $ '</Minute>
+					<Second>' $ s.dyn_tm_sec $ '</Second>
+				</NextRun>
+			</ScheduledTask_Update>
+		</Store>
+	</Provision>
+'" />
+<mvt:do file="g.module_feature_prv_ad" name="g.provision_result" value="PRV_Action_ProvisionStringData( g.xml )" />

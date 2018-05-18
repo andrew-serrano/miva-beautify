@@ -1,0 +1,25 @@
+token<mvt:assign name="l.settings:scopes" value="miva_array_deserialize( 'l,g,s' )" />
+<table border="1">
+	<mvt:foreach iterator="scope" array="scopes">
+		<tr>
+			<td colspan="2"><h1>&mvt:scope;</h1></td>
+		</tr>
+		<tr>
+			<td>Variable Name</td>
+			<td>Value</td>
+		</tr>
+		<mvt:assign name="l.members" value="miva_getvarlist(l.settings:scope)" />
+		<mvt:assign name="l.settings:members" value="miva_array_deserialize(l.members)" />
+		<mvt:foreach iterator="m" array="members">
+			<tr>
+			<mvt:assign name="l.settings:variable_value" value="miva_variable_value( l.settings:scope $ '.' $ l.settings:m)" />
+			<td><strong>&mvt:m;</strong></td>
+			<mvt:if expr="miva_array_elements(l.settings:variable_value) GT 0">
+				<td><mvt:eval expr="glosub(miva_array_serialize(l.settings:variable_value), ',', '<br />')" /></td>
+			<mvt:else>
+				<td>&mvt:variable_value;</td>
+			</mvt:if>
+			</tr>
+		</mvt:foreach>
+	</mvt:foreach>
+</table>

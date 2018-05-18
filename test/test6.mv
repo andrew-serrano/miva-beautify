@@ -1,0 +1,48 @@
+<mvt:comment>
+	| ---------------------------------------------
+	| LOGGING
+	| ---------------------------------------------
+</mvt:comment>
+
+<mvt:comment>
+	| Create Log Folders based on date: /YYYY/MM/DD/
+</mvt:comment>
+<mvt:assign name="l.settings:log:folder_path:base" value="'/logs/'" />
+<mvt:if expr="NOT fisdir( l.settings:log:folder_path:base )">
+	<mvt:assign name="l.settings:log:result:make_folder:base" value="fmkdir( l.settings:log:folder_path:base )" />
+</mvt:if>
+
+<mvt:assign name="l.settings:log:folder_path:year" value="l.settings:log:folder_path:base $ s.dyn_tm_year $ '/'" />
+<mvt:if expr="NOT fisdir( l.settings:log:folder_path:year )">
+	<mvt:assign name="l.settings:log:result:make_folder:year" value="fmkdir( l.settings:log:folder_path:year )" />
+	<mvt:if expr="NOT fisdir( l.settings:log:folder_path:year )">
+	<mvt:assign name="l.settings:log:result:make_folder:year" value="fmkdir( l.settings:log:folder_path:year )" />
+	<mvt:if expr="NOT fisdir( l.settings:log:folder_path:year )">
+	<mvt:assign name="l.settings:log:result:make_folder:year" value="fmkdir( l.settings:log:folder_path:year )" />
+	<mvt:if expr="NOT fisdir( l.settings:log:folder_path:year )">
+	<mvt:assign name="l.settings:log:result:make_folder:year" value="fmkdir( l.settings:log:folder_path:year )" />
+</mvt:if>
+</mvt:if>
+</mvt:if>
+</mvt:if>
+
+<mvt:assign name="l.settings:log:folder_path:month" value="l.settings:log:folder_path:year $ padl( s.dyn_tm_mon, 2, '0' ) $ '/'" />
+<mvt:if expr="NOT fisdir( l.settings:log:folder_path:month )">
+	<mvt:assign name="l.settings:log:result:make_folder:month" value="fmkdir( l.settings:log:folder_path:month )" />
+</mvt:if>
+
+<mvt:assign name="l.settings:log:folder_path:day" value="l.settings:log:folder_path:month $ padl( s.dyn_tm_mday, 2, '0' ) $ '/'" />
+<mvt:if expr="NOT fisdir( l.settings:log:folder_path:day )">
+	<mvt:assign name="l.settings:log:result:make_folder:day" value="fmkdir( l.settings:log:folder_path:day )" />
+</mvt:if>
+
+<mvt:comment>
+	| Create Log File
+</mvt:comment>
+<mvt:assign name="l.settings:log:file:name" value="s.dyn_time_t $ '.html'" />
+<mvt:assign name="l.settings:log:file:path" value="l.settings:log:folder_path:day $ l.settings:log:file:name" />
+<mvt:if expr="NOT fexists( l.settings:log:file:path )">
+	<mvt:assign name="l.settings:log:result:make_file" value="file_create( l.settings:log:file:path, 'data', l.NULL )" />
+</mvt:if>
+<mvt:assign name="l.settings:log:content" value="'This is the log content.'" />
+<mvt:assign name="l.settings:log:result:file_append" value="file_append( l.settings:log:file:path, 'data', l.settings:log:content )" />

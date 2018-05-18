@@ -1,0 +1,55 @@
+
+<mvt:comment>
+Load all possible variants using toolkit
+</mvt:comment>
+
+<mvt:item name="toolkit" param="variantarray|vcount|g.product_code" />
+
+<mvt:comment>
+Loop though variants, load product information for each variant, insert into new array
+</mvt:comment>
+
+<mvt:foreach iterator="variant" array="variants">
+
+<mvt:do file="g.Module_Library_DB" name="l.success" value="Product_Load_Code(l.settings:variant:variant_code, l.settings:product_variant_load)" />
+<mvt:assign name="l.array_count" value="miva_array_insert( l.settings:products, l.settings:product_variant_load, -1 )" />
+
+</mvt:foreach>
+
+
+<mvt:comment>
+Load predicted discounts for each variant (if exists)
+</mvt:comment>
+
+<mvt:do name="l.success" file="g.module_feature_tui_ut" value="CommonComponentFields_Initialize_Product_Discounts_Runtime( l.settings:products, 1 )" />
+
+
+<mvt:comment>
+Determine High / Low Prices
+</mvt:comment>
+
+<mvt:foreach iterator="variant" array="products">
+
+<mvt:if expr="pos1 EQ 1">
+    <mvt:assign name="g.low_price" value="l.settings:variant:price" />
+    <mvt:assign name="g.high_price" value="l.settings:variant:price" />
+</mvt:if>
+
+	<mvt:if expr="l.settings:variant:price GT g.high_price">
+		<mvt:assign name="g.high_price" value="l.settings:variant:price" />
+	</mvt:if>
+
+	<mvt:if expr="l.settings:variant:price LT g.low_price">
+		<mvt:assign name="g.low_price" value="l.settings:variant:price" />
+		<mvt:assign name="g.low_price_formatted" value="l.settings:variant:formatted_price" />
+	</mvt:if>
+
+</mvt:foreach>
+
+
+<mvt:comment>
+Format Currency
+</mvt:comment>
+
+<mvt:do name="g.low_price_formatted" file="g.Module_Root $ g.Store:currncy_mod:module" value="CurrencyModule_AddFormatting( g.Store:currncy_mod, g.low_price )" />
+<mvt:do name="g.high_price_formatted" file="g.Module_Root $ g.Store:currncy_mod:module" value="CurrencyModule_AddFormatting( g.Store:currncy_mod, g.high_price )" />

@@ -1,0 +1,15 @@
+<mvt:if expr="g.test EQ 1">
+<mvt:assign name="l.settings:credit:login"  value="gettoken( l.settings:line, asciichar(44), 1 ) " />
+      <mvt:assign name="l.settings:credit:name"   value="gettoken( l.settings:line, asciichar(44), 2 ) " />
+      <mvt:assign name="l.settings:credit:amount" value="gettoken( l.settings:line, asciichar(44), 3 ) " />
+
+      Login:  &mvt:credit:login; Your Mom Login:  &mvt:credit:login;
+      
+      Login:  &mvt:credit:login; Name:   &mvt:credit:name;<br>amount: &mvt:credit:amount;<br>
+      Order: <mvt:eval expr="g.order" />
+      <p><mvt:eval expr="g.order" /></p>
+      <mvt:assign name="g.variable" value="l.value" /> This is some text <br/> 
+      <mvt:if expr="g.test EQ 1"><mvt:eval expr="g.value" /><mvt:else>TOKEN &mvt:token;</mvt:if>
+      <p>Hello world &mvt:order:email; Hello world &mvt:order:email;Hello world &mvt:order:email;<p><mvt:eval expr="g.order" /></p></p>
+      <p>Hello world <mvt:assign name="g.variable" value="l.value" /></p>
+</mvt:if>

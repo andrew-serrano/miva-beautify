@@ -1,0 +1,11 @@
+<p>
+  <mvt:assign name="g.variable" value="l.value" />
+
+
+
+
+
+
+
+  <mvt:eval expr="g.value" />
+</p>

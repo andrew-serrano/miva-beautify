@@ -1,3 +1,686 @@
-<mvt:comment>
-	| --------------------------------------------- | LOGGING | ---------------------------------------------
+<mvt:comment> 
+CTS Whitelist Values
+Thickness: 06 || -08
+
+https://www.acmeplastics.com/cut-to-size-color-acrylic-sheet-cast?Thickness=-125&Length=50:0.031&Width=50:0.032&Color=Amber-2422
 </mvt:comment>
+
+<mvt:comment> CTS </mvt:comment>
+<mvt:if expr="'cut-to-size' CIN l.settings:product:code">
+  <mvt:comment> Initial </mvt:comment>
+  <mvt:assign name="l.query_params" value="''" />
+
+  <mvt:comment> Raw fraction values used by length/width </mvt:comment>
+  <mvt:assign name="l.fraction_values_raw" value="'
+        0:0/32,
+        0.031:1/32,
+        0.063:1/16,
+        0.094:3/32,
+        0.125:1/8,
+        0.156:5/32,
+        0.188:3/16,
+        0.219:7/32,
+        0.25:1/4,
+        0.281:9/32,
+        0.313:5/16,
+        0.344:11/32,
+        0.375:3/8,
+        0.406:13/32,
+        0.438:7/16,
+        0.469:15/32,
+        0.5:1/2,
+        0.531:17/32,
+        0.563:9/16,
+        0.594:19/32,
+        0.625:5/8,
+        0.656:21/32,
+        0.688:11/16,
+        0.719:23/32,
+        0.75:3/4,
+        0.781:25/32,
+        0.813:13/16,
+        0.844:27/32,
+        0.875:7/8,
+        0.906:29/32,
+        0.938:15/16,
+        0.969:31/32
+        '" />
+
+  <mvt:comment> Raw fraction values used by length/width </mvt:comment>
+  <mvt:assign name="l.fraction_values_raw_rod_tube" value="'
+        0:0/8,
+        0.125:1/8,
+        0.25:1/4,
+        0.375:3/8,
+        0.5:1/2,
+        0.625:5/8,
+        0.75:3/4,
+        0.875:7/8
+        '" />
+
+  <mvt:comment> Split </mvt:comment>
+  <mvt:assign name="l.fraction_values_raw_len" value="miva_splitstring( l.fraction_values_raw , ',', l.settings:fraction_values_raw_split , 'trim' )" />
+
+  <mvt:assign name="l.fraction_values_raw_rod_tube_len" value="miva_splitstring( l.fraction_values_raw_rod_tube , ',', l.settings:fraction_values_raw_rod_tube_split , 'trim' )" />
+
+  <mvt:comment> Create Array </mvt:comment>
+  <mvt:foreach iterator="fraction_raw" array="fraction_values_raw_split">
+    <mvt:comment> Array string </mvt:comment>
+    <mvt:if expr="NOT ISNULL l.fraction_raw_array_str">
+      <mvt:assign name="l.fraction_raw_array_str" value="l.fraction_raw_array_str $ ','" />
+    </mvt:if>
+
+    <mvt:comment> Split </mvt:comment>
+    <mvt:assign name="l.fraction_raw_len" value="miva_splitstring( l.settings:fraction_raw , ':', l.fraction_raw_split , 'trim' )" />
+
+    <mvt:assign name="l.fraction_raw_array_str" value="l.fraction_raw_array_str $ '[' $ l.pos1 $ ']:value=' $ l.fraction_raw_split[1] $ ','" />
+    <mvt:assign name="l.fraction_raw_array_str" value="l.fraction_raw_array_str $ '[' $ l.pos1 $ ']:prompt=' $ l.fraction_raw_split[2]" />
+
+  </mvt:foreach>
+
+  <mvt:comment> Create Array </mvt:comment>
+  <mvt:foreach iterator="fraction_values_raw_rod_tube" array="fraction_values_raw_rod_tube_split">
+    <mvt:comment> Array string </mvt:comment>
+    <mvt:if expr="NOT ISNULL l.fraction_raw_rod_tube_array_str">
+      <mvt:assign name="l.fraction_raw_rod_tube_array_str" value="l.fraction_raw_rod_tube_array_str $ ','" />
+    </mvt:if>
+
+    <mvt:comment> Split </mvt:comment>
+    <mvt:assign name="l.fraction_raw_rod_tube_len" value="miva_splitstring( l.settings:fraction_values_raw_rod_tube , ':', l.fraction_values_raw_rod_tube_split , 'trim' )" />
+
+    <mvt:assign name="l.fraction_raw_rod_tube_array_str" value="l.fraction_raw_rod_tube_array_str $ '[' $ l.pos1 $ ']:value=' $ l.fraction_values_raw_rod_tube_split[1] $ ','" />
+    <mvt:assign name="l.fraction_raw_rod_tube_array_str" value="l.fraction_raw_rod_tube_array_str $ '[' $ l.pos1 $ ']:prompt=' $ l.fraction_values_raw_rod_tube_split[2]" />
+  </mvt:foreach>
+
+  <mvt:comment> Create Array </mvt:comment>
+  <mvt:assign name="l.settings:fraction_values_arr" value="miva_array_deserialize(l.fraction_raw_array_str)" />
+  <mvt:assign name="l.settings:fraction_values_rod_tube_arr" value="miva_array_deserialize(l.fraction_raw_rod_tube_array_str)" />
+
+  <mvt:comment> Thickness </mvt:comment>
+  <mvt:if expr="NOT ISNULL g.Thickness">
+    <mvt:if expr="ISNULL l.query_params">
+      <mvt:assign name="l.query_params" value="l.query_params $ 'SX0-thickness=' $ encodeattribute(miva_html_strip( g.Thickness, '' ))" />
+    <mvt:else>
+      <mvt:assign name="l.query_params" value="l.query_params $ ',SX0-thickness=' $ encodeattribute(miva_html_strip( g.Thickness, '' ))" />
+    </mvt:if>
+  </mvt:if>
+
+  <mvt:comment> Length </mvt:comment>
+  <mvt:if expr="NOT ISNULL g.Length">
+    <mvt:comment> Split by : </mvt:comment>
+    <mvt:assign name="l.length_split_len" value="miva_splitstring( g.Length , ':', l.length_split , 'trim' )" />
+
+    <mvt:comment> Determine if we have at least two values and continue </mvt:comment>
+    <mvt:if expr="l.length_split_len EQ 2">
+      <mvt:comment> Length whole </mvt:comment>
+      <mvt:assign name="l.length_whole" value="encodeattribute(miva_html_strip(l.length_split[1],''))" />
+
+      <mvt:comment> Length fraction </mvt:comment>
+      <mvt:assign name="l.length_fraction" value="encodeattribute(miva_html_strip(l.length_split[2],''))" />
+
+      <mvt:comment> 
+			Append to query parameter string
+			If NULL don't add delimiter
+			else add delimiter 
+			</mvt:comment>
+      <mvt:if expr="ISNULL l.query_params">
+        <mvt:assign name="l.query_params" value="l.query_params $ 'whole-SX1-length=' $ encodeattribute(miva_html_strip( l.length_whole, '' ))" />
+        <mvt:assign name="l.query_params" value="l.query_params $ ',fraction-SX1-length=' $ encodeattribute(miva_html_strip( l.length_fraction, '' ))" />
+      <mvt:else>
+        <mvt:assign name="l.query_params" value="l.query_params $ ',whole-SX1-length=' $ encodeattribute(miva_html_strip( l.length_whole, '' ))" />
+        <mvt:assign name="l.query_params" value="l.query_params $ ',fraction-SX1-length=' $ encodeattribute(miva_html_strip( l.length_fraction, '' ))" />
+      </mvt:if>
+    </mvt:if>
+  </mvt:if>
+
+  <mvt:comment> Width </mvt:comment>
+  <mvt:if expr="NOT ISNULL g.Width">
+    <mvt:comment> Split by : </mvt:comment>
+    <mvt:assign name="l.width_split_len" value="miva_splitstring( g.Width , ':', l.width_split , 'trim' )" />
+
+    <mvt:comment> Determine if we have at least two values and continue </mvt:comment>
+    <mvt:if expr="l.width_split_len EQ 2">
+
+      <mvt:comment> Width whole </mvt:comment>
+      <mvt:assign name="l.width_whole" value="encodeattribute(miva_html_strip(l.width_split[1],''))" />
+
+      <mvt:comment> Width fraction </mvt:comment>
+      <mvt:assign name="l.width_fraction" value="encodeattribute(miva_html_strip(l.width_split[2],''))" />
+
+      <mvt:if expr="ISNULL l.query_params">
+        <mvt:assign name="l.query_params" value="l.query_params $ 'whole-SX2-width=' $ encodeattribute(miva_html_strip( l.width_whole, '' ))" />
+        <mvt:assign name="l.query_params" value="l.query_params $ ',fraction-SX2-width=' $ encodeattribute(miva_html_strip( l.width_fraction, '' ))" />
+      <mvt:else>
+        <mvt:assign name="l.query_params" value="l.query_params $ ',whole-SX2-width=' $ encodeattribute(miva_html_strip( l.width_whole, '' ))" />
+        <mvt:assign name="l.query_params" value="l.query_params $ ',fraction-SX2-width=' $ encodeattribute(miva_html_strip( l.width_fraction, '' ))" />
+      </mvt:if>
+    </mvt:if>
+  </mvt:if>
+
+  <mvt:comment> Color </mvt:comment>
+  <mvt:if expr="NOT ISNULL g.Color">
+    <mvt:if expr="ISNULL l.query_params">
+      <mvt:assign name="l.query_params" value="l.query_params $ 'color=' $ encodeattribute(miva_html_strip( g.Color, '' ))" />
+    <mvt:else>
+      <mvt:assign name="l.query_params" value="l.query_params $ ',color=' $ encodeattribute(miva_html_strip( g.Color, '' ))" />
+    </mvt:if>
+  </mvt:if>
+
+  <mvt:comment> Split by delimiter </mvt:comment>
+  <mvt:assign name="l.null" value="miva_splitstring( l.query_params, ',', l.settings:query_params_split, 'trim' )" />
+
+  <mvt:comment> Iterate over string </mvt:comment>
+  <mvt:foreach iterator="query_param" array="query_params_split">
+    <mvt:comment> Array string </mvt:comment>
+    <mvt:if expr="NOT ISNULL l.option_array_str">
+      <mvt:assign name="l.option_array_str" value="l.option_array_str $ ','" />
+    </mvt:if>
+
+    <mvt:comment> Split name=value </mvt:comment>
+    <mvt:assign name="l.query_param_split_len" value="miva_splitstring( l.settings:query_param, '=', l.query_param_split, 'trim' )" />
+
+    <mvt:comment> Stop something went wrong. </mvt:comment>
+    <mvt:if expr="l.query_param_split_len GT 4">
+      <mvt:foreachstop/>
+    </mvt:if>
+
+    <mvt:comment> Return key </mvt:comment>
+    <mvt:assign name="l.key" value="l.query_param_split[1]" />
+
+    <mvt:comment> Return value </mvt:comment>
+    <mvt:assign name="l.value" value="l.query_param_split[2]" />
+
+    <mvt:assign name="l.option_array_str" value="l.option_array_str $ '[' $ l.pos1 $ ']:value=' $ l.value $ ','" />
+    <mvt:assign name="l.option_array_str" value="l.option_array_str $ '[' $ l.pos1 $ ']:status=0,'" />
+    <mvt:assign name="l.option_array_str" value="l.option_array_str $ '[' $ l.pos1 $ ']:attribute_code=' $ l.key" />
+
+  </mvt:foreach>
+
+  <mvt:comment> Create array </mvt:comment>
+  <mvt:assign name="l.query_parameters_options" value="miva_array_deserialize( l.option_array_str )" />
+
+  <mvt:comment> Create Copy to avoid manipulation</mvt:comment>
+  <mvt:assign name="l.null" value="miva_array_copy( l.query_parameters_options, 1, miva_array_elements(l.query_parameters_options), l.settings:query_parameters_options_copy, 1 )" />
+
+</mvt:if>
+
+<mvt:comment> Attribute Template </mvt:comment>
+<mvt:foreach iterator="attribute" array="attributes">
+  <mvt:comment> NULL </mvt:comment>
+  <mvt:assign name="l.settings:cts_fraction_attribute_code" value="''" />
+  <mvt:assign name="l.settings:cts_whole_attribute_code" value="''" />
+  <mvt:assign name="l.query_parameters_options_copy_index" value="''" />
+
+  <mvt:assign name="l.settings:attributeID" value="'l-' $ tolower(l.settings:attribute:code)" />
+  <input type="hidden" name="Product_Attributes[&mvte:attribute:index;]:code" value="&mvte:attribute:code;" data-attribute-type="&mvte:attribute:type;" />
+
+  <mvt:if expr="l.settings:attribute:template_code NE 0">
+    <input type="hidden" name="Product_Attributes[&mvte:attribute:index;]:template_code" value="&mvte:attribute:template_code;" />
+  </mvt:if>
+
+  <mvt:if expr="l.settings:attribute:code EQ 'width' OR l.settings:attribute:template_code EQ 'width'">
+    <div class="clear clearfix"></div>
+    <div id="mini-border"></div>
+  </mvt:if>
+
+  <mvt:if expr="l.settings:attribute:code EQ 'timestamptemplate'">
+    <input type="hidden" name="Product_Attributes[&mvte:attribute:index;]:value" id="timestamp">
+  <mvt:else>
+
+    <mvt:if expr="l.settings:attribute:type EQ 'text'">
+
+      <mvt:comment>CTS</mvt:comment>
+      <mvt:if expr="('Yes' CIN l.settings:dimensional OR l.settings:dimensional EQ 1) AND (l.settings:attribute:code EQ 'SX1-length' OR l.settings:attribute:code EQ 'SX2-width')">
+
+        <input type="hidden" name="Product_Attributes[&mvte:attribute:index;]:value" value="&mvte:attribute:value;" id="&mvt:attributeID;" data-attribute="&mvte:attribute:code;" data-option-price="&mvt:attribute:price;" data-regular-price="" />
+        <div class="column whole">
+
+          <mvt:if expr="l.settings:attribute:required">
+            <label for="&mvt:attributeID;" id="&mvt:attribute:code;-label" title="&mvte:attribute:prompt;" class="txt-label required">&mvte:attribute:prompt; (inches) <small id="minmax-&mvt:attribute:code;"></small></label>
+          <mvt:else>
+            <label for="&mvt:attributeID;" id="&mvt:attribute:code;-label" title="&mvte:attribute:prompt;" class="txt-label">&mvte:attribute:prompt; (inches) <small id="minmax-&mvt:attribute:code;"></small></label>
+          </mvt:if>
+
+        </div>
+        <div class="column small-five-twelfths half">
+          <mvt:comment> Create code </mvt:comment>
+          <mvt:assign name="l.settings:cts_whole_attribute_code" value="'whole-' $ l.settings:attribute:code" />
+
+          <mvt:comment> Find a match value </mvt:comment>
+          <mvt:assign name="l.whole_query_param_found" value="miva_array_filter(l.query_parameters_options, 0, l.query_param, 'l.query_param:attribute_code EQ l.settings:cts_whole_attribute_code', l.whole_query_param) GT 0" />
+
+          <mvt:if expr="l.whole_query_param_found">
+
+            <mvt:comment> Return fist element </mvt:comment>
+            <mvt:assign name="l.settings:whole_query_param" value="miva_array_shift(l.whole_query_param)" />
+
+            <mvt:comment> Return index of where the element was found to update the status</mvt:comment>
+            <mvt:assign name="l.query_parameters_options_copy_index" value="miva_array_search( l.settings:query_parameters_options_copy, 0, l.query_param_copy, 'l.query_param_copy:attribute_code EQ l.settings:whole_query_param:attribute_code' )" />
+
+            <mvt:comment> If we have a found element </mvt:comment>
+            <mvt:if expr="l.query_parameters_options_copy_index GT 0">
+              <mvt:comment> Update Status </mvt:comment>
+              <mvt:foreach iterator="query_param_copy" array="query_parameters_options_copy">
+                <mvt:if expr="l.pos2 EQ l.query_parameters_options_copy_index">
+                  <mvt:assign name="l.settings:query_param_copy:status" value="1" />
+                </mvt:if>
+              </mvt:foreach>
+            </mvt:if>
+
+          </mvt:if>
+
+          <mvt:comment> 
+						TODO: Check customfield values to make sure it's valid
+						</mvt:comment>
+
+          <mvt:if expr="l.settings:attribute:code EQ 'SX1-length' OR l.settings:attribute:code EQ 'SX2-width'">
+            <mvt:if expr="l.whole_query_param_found">
+              <input type="text" id="&mvt:cts_whole_attribute_code;" class="cts_r numericOnly" value="&mvt:whole_query_param:value;" placeholder="Whole Number" />
+            <mvt:else>
+              <input type="text" id="&mvt:cts_whole_attribute_code;" class="cts_r numericOnly" placeholder="Whole Number" />
+            </mvt:if>
+          </mvt:if>
+        </div>
+
+        <div class="column small-one-twelfth medium-two-twelfths large-one-twelfth small-show hide"><span class="and-spacer">and</span></div>
+        <div class="column small-five-twelfths half">
+
+          <mvt:comment> Create code </mvt:comment>
+          <mvt:assign name="l.settings:cts_fraction_attribute_code" value="'fraction-' $ l.settings:attribute:code" />
+
+          <select id="&mvt:cts_fraction_attribute_code;" class="attr_select">
+            <mvt:comment> Cut to size rod/tube </mvt:comment>
+            <mvt:if expr="'cut-to-size-rod' CIN l.settings:product:code OR 'cut-to-size-tube' CIN l.settings:product:code">
+              <mvt:foreach iterator="fraction_value_1" array="fraction_values_rod_tube_arr">
+
+                <mvt:comment> Find a match value </mvt:comment>
+                <mvt:assign name="l.fraction_query_param_found" value="miva_array_filter(l.query_parameters_options, 0, l.query_param, 'l.query_param:value EQ l.settings:fraction_value_1:value AND l.query_param:attribute_code EQ l.settings:cts_fraction_attribute_code', l.fraction_query_param) GT 0" />
+
+                <mvt:comment> Found update status </mvt:comment>
+                <mvt:if expr="l.fraction_query_param_found">
+
+                  <mvt:comment> Return index of where the element was found to update the status</mvt:comment>
+                  <mvt:assign name="l.query_parameters_options_copy_index" value="miva_array_search( l.settings:query_parameters_options_copy, 0, l.query_param_copy, 'l.query_param_copy:attribute_code EQ l.settings:cts_fraction_attribute_code' )" />
+
+                  <mvt:comment> Update Status </mvt:comment>
+                  <mvt:foreach iterator="query_param_copy" array="query_parameters_options_copy">
+                    <mvt:if expr="l.pos3 EQ l.query_parameters_options_copy_index">
+                      <mvt:assign name="l.settings:query_param_copy:status" value="1" />
+                    </mvt:if>
+                  </mvt:foreach>
+
+                </mvt:if>
+
+                <mvt:if expr="l.settings:fraction_value_1:value EQ '0'">
+                  <mvt:if expr="l.fraction_query_param_found">
+                    <option selected value="">&mvt:fraction_value_1:prompt;</option>
+                  <mvt:else>
+                    <option value="">&mvt:fraction_value_1:prompt;</option>
+                  </mvt:if>
+                <mvt:else>
+                  <mvt:if expr="l.fraction_query_param_found">
+                    <option selected value="&mvt:fraction_value_1:value;">&mvt:fraction_value_1:prompt; (&mvt:fraction_value_1:value;)</option>
+                  <mvt:else>
+                    <option value="&mvt:fraction_value_1:value;">&mvt:fraction_value_1:prompt; (&mvt:fraction_value_1:value;)</option>
+                  </mvt:if>
+                </mvt:if>
+              </mvt:foreach>
+              <mvt:comment> <option value="">0/8</option>
+								<option value="0.125">1/8 (0.125)</option>
+								<option value="0.25">1/4 (0.25)</option>
+								<option value="0.375">3/8 (0.375)</option>
+								<option value="0.5">1/2 (0.5)</option>
+								<option value="0.625">5/8 (0.625)</option>
+								<option value="0.75">3/4 (0.75)</option>
+								<option value="0.875">7/8 (0.875)</option> 
+								</mvt:comment>
+            <mvt:else>
+              <mvt:comment> Cut to size </mvt:comment>
+              <mvt:foreach iterator="fraction_value_2" array="fraction_values_arr">
+                <mvt:comment> Find a match value </mvt:comment>
+                <mvt:assign name="l.fraction_query_param_found" value="miva_array_filter(l.query_parameters_options, 0, l.query_param, 'l.query_param:value EQ l.settings:fraction_value_2:value AND l.query_param:attribute_code EQ l.settings:cts_fraction_attribute_code', l.fraction_query_param) GT 0" />
+
+                <mvt:comment> Update status if we have found an element </mvt:comment>
+                <mvt:if expr="l.fraction_query_param_found">
+                  <mvt:comment> Return index of where the element was found to update the status</mvt:comment>
+                  <mvt:assign name="l.query_parameters_options_copy_index" value="miva_array_search( l.settings:query_parameters_options_copy, 0, l.query_param_copy, 'l.query_param_copy:attribute_code EQ l.settings:cts_fraction_attribute_code' )" />
+
+                  <mvt:comment> Update Status </mvt:comment>
+                  <mvt:foreach iterator="query_param_copy" array="query_parameters_options_copy">
+                    <mvt:if expr="l.pos3 EQ l.query_parameters_options_copy_index">
+                      <mvt:assign name="l.settings:query_param_copy:status" value="1" />
+                    </mvt:if>
+                  </mvt:foreach>
+                </mvt:if>
+
+                <mvt:if expr="l.settings:fraction_value_2:value EQ '0'">
+                  <mvt:if expr="l.fraction_query_param_found">
+                    <option selected value="">&mvt:fraction_value_2:prompt;</option>
+                  <mvt:else>
+                    <option value="">&mvt:fraction_value_2:prompt;</option>
+                  </mvt:if>
+                <mvt:else>
+                  <mvt:if expr="l.fraction_query_param_found">
+                    <option selected value="&mvt:fraction_value_2:value;">&mvt:fraction_value_2:prompt; (&mvt:fraction_value_2:value;)</option>
+                  <mvt:else>
+                    <option value="&mvt:fraction_value_2:value;">&mvt:fraction_value_2:prompt; (&mvt:fraction_value_2:value;)</option>
+                  </mvt:if>
+                </mvt:if>
+              </mvt:foreach>
+            </mvt:if>
+          </select>
+        </div>
+        <mvt:comment> Info Message for cut-to-size-rod/tube </mvt:comment>
+        <mvt:if expr="'cut-to-size-rod' CIN l.settings:product:code OR 'cut-to-size-tube' CIN l.settings:product:code">
+          <div class="column whole">
+            <div class="cts-info-container hide">
+              <p class="message-info cts-info" style="font-size: 12px; display: inline-block; padding: 5px;"></p>
+            </div>
+          </div>
+        </mvt:if>
+      <mvt:else>
+        <mvt:if expr="l.settings:attribute:code EQ 'width' OR l.settings:attribute:template_code EQ 'width'">
+          <div class="hide custom-cut">
+            <div class="column medium-half whole">
+              <!-- Width -->
+              <div class="custom-cut-label"><label for="&mvt:attributeID;" title="&mvte:attribute:prompt;" class="bold">Width: (inches)</label></div>
+              <input type="text" name="Product_Attributes[&mvte:attribute:index;]:value" value="&mvte:attribute:value;" id="l-width" data-attribute="&mvte:attribute:code;" data-option-price="&mvt:attribute:price;" data-regular-price="" class="column one-eighth" />
+            </div>
+            <mvt:comment><div class="column small-one-twelfth medium-two-twelfths large-one-twelfth small-show hide"><span class="and-spacer">X</span></div></mvt:comment>
+          </div>
+        <mvt:elseif expr="l.settings:attribute:code EQ 'length' OR l.settings:attribute:template_code EQ 'length'">
+          <div class="hide custom-cut">
+            <div class="column medium-half whole">
+              <!-- length -->
+              <div class="custom-cut-label"><label for="&mvt:attributeID;" title="&mvte:attribute:prompt;" class="bold">Length: (inches)</label></div>
+              <input type="text" name="Product_Attributes[&mvte:attribute:index;]:value" value="&mvte:attribute:value;" id="l-length" data-attribute="&mvte:attribute:code;" data-option-price="&mvt:attribute:price;" data-regular-price="" class="column one-eighth" />
+            </div>
+          </div>
+        <mvt:else>
+          <div class="column half">
+            <mvt:if expr="l.settings:attribute:required">
+              <label for="&mvt:attributeID;" title="&mvte:attribute:prompt;" class="txt-label required">&mvte:attribute:prompt;</label>
+            <mvt:else>
+              <label for="&mvt:attributeID;" title="&mvte:attribute:prompt;" class="txt-label">&mvte:attribute:prompt;</label>
+            </mvt:if>
+            <input type="text" name="Product_Attributes[&mvte:attribute:index;]:value" value="&mvte:attribute:value;" id="&mvt:attributeID;" data-attribute="&mvte:attribute:code;" data-option-price="&mvt:attribute:price;" data-regular-price="" />
+          </div>
+        </mvt:if>
+      </mvt:if>
+      <mvt:comment>CTS</mvt:comment>
+    <mvt:elseif expr="l.settings:attribute:type EQ 'memo'">
+      <div class="form-row">
+        <mvt:if expr="l.settings:attribute:required">
+          <label for="&mvt:attributeID;" title="&mvte:attribute:prompt;" class="required">&mvte:attribute:prompt;</label>
+        <mvt:else>
+          <label for="&mvt:attributeID;" title="&mvte:attribute:prompt;">&mvte:attribute:prompt;</label>
+        </mvt:if>
+        <textarea name="Product_Attributes[&mvt:attribute:index;]:value" id="&mvt:attributeID;" data-attribute="&mvte:attribute:code;" data-option-price="&mvt:attribute:price;" data-regular-price="">&mvte:attribute:value;</textarea>
+      </div>
+    <mvt:elseif expr="l.settings:attribute:type EQ 'radio'">
+      <div class="form-row">
+        <mvt:if expr="l.settings:attribute:required">
+          <legend for="&mvt:attributeID;" title="&mvte:attribute:prompt;" class="nm required">&mvte:attribute:prompt;</legend>
+        <mvt:else>
+          <legend for="&mvt:attributeID;" title="&mvte:attribute:prompt;" class="nm normal">&mvte:attribute:prompt;</legend>
+        </mvt:if>
+        <mvt:foreach iterator="option" array="attribute:options">
+          <mvt:assign name="l.settings:optionID" value="'l-' $ tolower(l.settings:option:code)" />
+          <label for="&mvt:optionID;" title="&mvt:option:prompt;" class="show">
+            <mvt:if expr="((g.Product_Attributes[l.settings:attribute:index]:value EQ 0) AND (l.settings:option:id EQ l.settings:attribute:default_id)) OR (g.Product_Attributes[l.settings:attribute:index]:value EQ l.settings:option:code)">
+              <input type="radio" name="Product_Attributes[&mvte:attribute:index;]:value" value="&mvte:option:code;" id="&mvt:optionID;" data-attribute="&mvte:attribute:code;" data-option-price="&mvt:option:price;" data-regular-price="" checked />
+            <mvt:else>
+              <input type="radio" name="Product_Attributes[&mvte:attribute:index;]:value" value="&mvte:option:code;" id="&mvt:optionID;" data-attribute="&mvte:attribute:code;" data-option-price="&mvt:option:price;" data-regular-price="" />
+            </mvt:if>
+            <mvt:if expr="l.settings:option:image">
+              <img src="&mvte:option:image;" alt="&mvte:option:prompt;" title="&mvte:option:prompt;" />
+            <mvt:else>
+              &mvte:option:prompt;
+              <mvt:if expr="l.settings:option:price">
+                <mvt:if expr="l.settings:option:price GT 0">
+                  &nbsp;<mvt:eval expr="'+ $' $ abs(rnd(l.settings:option:price, 2))" />
+                <mvt:else>
+                  &nbsp;<mvt:eval expr="'- $' $ abs(rnd(l.settings:option:price, 2))" />
+                </mvt:if>
+              </mvt:if>
+            </mvt:if>
+          </label>
+        </mvt:foreach>
+      </div>
+    <mvt:elseif expr="l.settings:attribute:type EQ 'select'">
+      <mvt:comment>CTS</mvt:comment>
+      <mvt:if expr="('Yes' CIN l.settings:dimensional OR l.settings:dimensional EQ 1) AND l.settings:attribute:code EQ 'SX0-thickness'">
+        <div class="column whole">
+          <label for="&mvt:attributeID;" id="&mvt:attribute:code;-label" title="&mvte:attribute:prompt;" class="txt-label required">&mvte:attribute:prompt; (inches)</label>
+        </div>
+        <div class="column small-eleven-twelfths medium-whole large-eleven-twelfths whole">
+      <mvt:else>
+        <div class="column medium-half whole">
+      </mvt:if>
+
+      <mvt:comment>CTS</mvt:comment>
+      <mvt:assign name="l.settings:attribute:prompt" value="glosub( l.settings:attribute:prompt, ':', '' )" />
+
+      <mvt:if expr="l.settings:attribute:required">
+        <select name="Product_Attributes[&mvt:attribute:index;]:value" id="&mvt:attributeID;" data-attribute="&mvte:attribute:code;" class="required cts_r attr_select" title="&mvte:attribute:prompt;">
+      <mvt:else>
+        <select name="Product_Attributes[&mvt:attribute:index;]:value" id="&mvt:attributeID;" data-attribute="&mvte:attribute:code;" class="attr_select" title="&mvte:attribute:prompt;">
+      </mvt:if>
+
+      <mvt:if expr="l.settings:attribute:prompt NE 'Custom Cut?'">
+        <option value="">Select &mvt:attribute:prompt;</option>
+      <mvt:else>
+        <mvt:assign name="l.hascustomcut" value="1" />
+        <option value="no">&mvt:attribute:prompt;</option>
+      </mvt:if>
+
+      <mvt:foreach iterator="option" array="attribute:options">
+
+        <mvt:comment> Find a match value </mvt:comment>
+        <mvt:assign name="l.dynamic_option_found" value="miva_array_filter(l.query_parameters_options, 0, l.query_param, 'l.query_param:value EQ l.settings:option:code', l.dynamic_option) GT 0" />
+
+        <mvt:comment> If found update option code</mvt:comment>
+        <mvt:if expr="l.dynamic_option_found">
+          <mvt:comment> Return First Index </mvt:comment>
+          <mvt:assign name="l.dynamic_option" value="miva_array_shift(l.dynamic_option)" />
+          <mvt:assign name="l.settings:option:code" value="l.dynamic_option:value" />
+
+          <mvt:comment> Return index of where the element was found to update the status</mvt:comment>
+          <mvt:assign name="l.query_parameters_options_copy_index" value="miva_array_search( l.settings:query_parameters_options_copy, 0, l.query_param_copy, 'l.query_param_copy:attribute_code EQ l.dynamic_option:attribute_code' )" />
+
+          <mvt:comment> Update Status </mvt:comment>
+          <mvt:foreach iterator="query_param_copy" array="query_parameters_options_copy">
+            <mvt:if expr="l.pos3 EQ l.query_parameters_options_copy_index">
+              <mvt:assign name="l.settings:query_param_copy:status" value="1" />
+            </mvt:if>
+          </mvt:foreach>
+
+        </mvt:if>
+
+        <mvt:comment> CTS </mvt:comment>
+        <mvt:if expr="('cut-to-size-tube' CIN l.settings:product:code OR 'cut-to-size-rod' CIN l.settings:product:code) AND l.settings:attribute:code EQ 'SX0-thickness'">
+
+          <mvt:comment> E.G. 5-75 Replace - with . </mvt:comment>
+          <mvt:assign name="l.settings:option:opt_code" value="glosub( l.settings:option:code , '-' , '.')" />
+
+          <mvt:comment> Split string by x </mvt:comment>
+          <mvt:assign name="g.null" value="miva_splitstring( l.settings:option:opt_code , 'x' , l.settings:option:opt_code_sep, 'trim' )" />
+
+          <mvt:if expr="NOT ISNULL l.settings:option:opt_code_sep">
+            <mvt:assign name="l.settings:cts_diameter_outer" value="l.settings:option:opt_code_sep[1] + 0" />
+            <mvt:assign name="l.settings:cts_diameter_inner" value="l.settings:option:opt_code_sep[2] + 0" />
+          </mvt:if>
+
+          <mvt:assign name="l.settings:cts_attribute_text" value="'data-outerdiameter=\" ' $ l.settings:cts_diameter_outer $ '\ "'" />
+        </mvt:if>
+
+        <mvt:comment> If found select option and output </mvt:comment>
+        <mvt:if expr="l.dynamic_option_found">
+          <option selected value="&mvte:option:code;" data-option-price="&mvt:option:price;" data-regular-price="" &mvt:cts_attribute_text;>
+        <mvt:else>
+          <option value="&mvte:option:code;" data-option-price="&mvt:option:price;" data-regular-price="" &mvt:cts_attribute_text;>
+        </mvt:if>
+        &mvte:option:prompt;
+        <mvt:if expr="substring_var(l.settings:attribute:code, 1, 4) NE 'SX0-'">
+          <mvt:if expr="l.settings:option:price">
+            <mvt:if expr="l.settings:option:price GT 0">
+              &nbsp;
+              <mvt:eval expr="' +$' $ abs(rnd(l.settings:option:price, 2))" />
+            <mvt:else>
+              &nbsp;
+              <mvt:eval expr="' -$' $ abs(rnd(l.settings:option:price, 2))" />
+            </mvt:if>
+          </mvt:if>
+        </mvt:if>
+        </option>
+
+      </mvt:foreach>
+
+      </select>
+      </div>
+    <mvt:elseif expr="l.settings:attribute:type EQ 'swatch-select'">
+      <div class="form-row">
+        <mvt:assign name="g.hasSwatches" value="'1'" />
+        <mvt:if expr="l.settings:attribute:required">
+          <label for="js-swatches-select" title="&mvt:attribute:prompt;" class="required">&mvt:attribute:prompt;</label>
+        <mvt:else>
+          <label for="js-swatches-select" title="&mvt:attribute:prompt;">&mvt:attribute:prompt;</label>
+        </mvt:if>
+        <select name="Product_Attributes[&mvt:attribute:index;]:value" id="js-swatches-select" class="attr_select" data-attribute="&mvte:attribute:code;">
+          <mvt:foreach iterator="option" array="attribute:options">
+            <mvt:if expr="((g.Product_Attributes[l.settings:attribute:index]:value EQ 0) AND (l.settings:option:id EQ l.settings:attribute:default_id)) OR (g.Product_Attributes[l.settings:attribute:index]:value EQ l.settings:option:code)">
+              <option value="&mvte:option:code;" data-option-price="&mvt:option:price;" data-regular-price="" selected>
+                &mvte:option:prompt;
+                <mvt:if expr="substring_var(l.settings:attribute:code, 1, 4) NE 'SX0-'">
+                  <mvt:if expr="l.settings:option:price">
+                    <mvt:if expr="l.settings:option:price GT 0">
+                      &nbsp;
+                      <mvt:eval expr="' +$' $ abs(rnd(l.settings:option:price, 2))" />
+                    <mvt:else>
+                      &nbsp;
+                      <mvt:eval expr="' -$' $ abs(rnd(l.settings:option:price, 2))" />
+                    </mvt:if>
+                  </mvt:if>
+                </mvt:if>
+              </option>
+            <mvt:else>
+              <option value="&mvte:option:code;" data-option-price="&mvt:option:price;" data-regular-price="">
+                &mvte:option:prompt;
+                <mvt:if expr="l.settings:option:price">
+                  <mvt:if expr="l.settings:option:price GT 0">
+                    &nbsp;
+                    <mvt:eval expr="' +$' $ abs(rnd(l.settings:option:price, 2))" />
+                  <mvt:else>
+                    &nbsp;
+                    <mvt:eval expr="' -$' $ abs(rnd(l.settings:option:price, 2))" />
+                  </mvt:if>
+                </mvt:if>
+              </option>
+            </mvt:if>
+          </mvt:foreach>
+        </select>
+      </div>
+    <mvt:elseif expr="l.settings:attribute:type EQ 'checkbox'">
+      <div class="column form-row">
+        <mvt:if expr="l.settings:attribute:required">
+          <label for="&mvt:attributeID;" title="&mvte:attribute:prompt;" class="required">
+            <mvt:if expr="g.Product_Attributes[l.settings:attribute:index]:value">
+              <input type="checkbox" name="Product_Attributes[&mvte:attribute:index;]:value" value="Yes" id="&mvt:attributeID;" checked="checked" data-attribute="&mvte:attribute:code;" data-option-price="&mvt:attribute:price;" data-regular-price="" />
+            <mvt:else>
+              <input type="checkbox" name="Product_Attributes[&mvte:attribute:index;]:value" id="&mvt:attributeID;" data-attribute="&mvte:attribute:code;" data-option-price="&mvt:attribute:price;" data-regular-price="" />
+            </mvt:if>
+            <mvt:if expr="l.settings:attribute:image">
+              <img src="&mvte:attribute:image;" alt="&mvte:attribute:prompt;" title="&mvte:attribute:prompt;" />
+            <mvt:else>
+              &mvte:attribute:prompt;
+              <mvt:if expr="l.settings:attribute:price">
+                <mvt:if expr="l.settings:attribute:price GT 0">
+                  &nbsp;<mvt:eval expr="' +$' $ abs(rnd(l.settings:attribute:price, 2))" />
+                <mvt:else>
+                  &nbsp;<mvt:eval expr="' -$' $ abs(rnd(l.settings:attribute:price, 2))" />
+                </mvt:if>
+              </mvt:if>
+            </mvt:if>
+          </label>
+        <mvt:else>
+          <label for="&mvt:attributeID;" title="&mvte:attribute:prompt;">
+            <mvt:if expr="g.Product_Attributes[l.settings:attribute:index]:value">
+              <input type="checkbox" name="Product_Attributes[&mvte:attribute:index;]:value" value="Yes" id="&mvt:attributeID;" checked="checked" data-attribute="&mvte:attribute:code;" data-option-price="&mvt:attribute:price;" data-regular-price="" />
+            <mvt:else>
+              <input type="checkbox" name="Product_Attributes[&mvte:attribute:index;]:value" id="&mvt:attributeID;" data-attribute="&mvte:attribute:code;" data-option-price="&mvt:attribute:price;" data-regular-price="" />
+            </mvt:if>
+            <mvt:if expr="l.settings:attribute:image">
+              <img src="&mvte:attribute:image;" alt="&mvte:attribute:prompt;" title="&mvte:attribute:prompt;" />
+            <mvt:else>
+              &mvte:attribute:prompt;
+              <mvt:if expr="l.settings:attribute:price">
+                <mvt:if expr="l.settings:attribute:price GT 0">
+                  &nbsp;<mvt:eval expr="' +$' $ abs(rnd(l.settings:attribute:price, 2))" />
+                <mvt:else>
+                  &nbsp;<mvt:eval expr="' -$' $ abs(rnd(l.settings:attribute:price, 2))" />
+                </mvt:if>
+
+                <mvt:comment>CTS</mvt:comment>
+                <mvt:if expr="l.settings:attribute:code EQ 'polished-edges'">
+                 per inch
+                </mvt:if>
+                <mvt:comment>CTS</mvt:comment>
+              </mvt:if>
+            </mvt:if>
+          </label>
+        </mvt:if>
+      </div>
+    </mvt:if>
+
+  </mvt:if>
+
+</mvt:foreach>
+<mvt:if expr="l.hascustomcut">
+  <div class="custom-cut whole column custom-cut-info hide">
+    <div class="error error-message" id="custom-cut-error"></div>
+    <span data-icon="&#xe061;"></span> Please account for ¼" saw blade allowance when entering your size
+  </div>
+</mvt:if>
+<input type="hidden" name="Product_Attribute_Count" value="<mvt:eval expr=" miva_array_elements(l.settings:attributes) " />" id="js-product-attribute-count" />
+
+
+<mvt:comment> Server Side Call For Query Params </mvt:comment>
+<mvt:if expr="NOT ISNULL l.settings:query_parameters_options_copy">
+  <mvt:comment> Check whether query parameters are valid </mvt:comment>
+  <mvt:assign name="l.query_parameters_not_valid" value="miva_array_search( l.settings:query_parameters_options_copy , 0 , l.query_param, 'l.query_param:status EQ 0' ) GT 0" />
+
+  <mvt:comment> If all of our query parameters are valid continue </mvt:comment>
+  <mvt:if expr="NOT l.query_parameters_not_valid">
+    <mvt:comment> 
+    [1]:attribute_code=SX0-thickness
+    [1]:status=1
+    [1]:value=06
+    [2]:attribute_code=whole-SX1-length
+    [2]:status=1
+    [2]:value=50
+    [3]:attribute_code=fraction-SX1-length
+    [3]:status=1
+    [3]:value=0.031
+    [4]:attribute_code=whole-SX2-width
+    [4]:status=1
+    [4]:value=50
+    [5]:attribute_code=fraction-SX2-width
+    [5]:status=1
+    [5]:value=0.031
+    </mvt:comment>
+
+    <mvt:comment> Attribute Structure </mvt:comment>
+    <mvt:foreach iterator="query_param_copy" array="query_parameters_options_copy">
+      <mvt:eval expr="decodeattribute(glosub(miva_array_serialize(l.settings:query_param_copy), ',', '<br>'))" />
+    </mvt:foreach>
+
+    <mvt:comment> ADPR Fields </mvt:comment>
+    <mvt:assign name="g.Quantity" value="g.Quantity" />
+    <mvt:assign name="g.Product_Code" value="l.settings:product:code" />
+    <mvt:assign name="g.Product_Attributes" value="l.value" />
+
+    <mvt:comment> <mvt:do file="g.Module_Merchant" name="l.success" value="Action_AddProductToBasket()" /> </mvt:comment>
+
+  </mvt:if>
+
+</mvt:if>

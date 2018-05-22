@@ -1,11 +1,9 @@
-<p>
-  <mvt:assign name="g.variable" value="l.value" />
-
-
-
-
-
-
-
-  <mvt:eval expr="g.value" />
-</p>
+<mvt:comment>CTS</mvt:comment>
+<mvt:if expr="('Yes' CIN l.settings:dimensional OR l.settings:dimensional EQ 1) AND l.settings:attribute:code EQ 'SX0-thickness'">
+  <div class="column whole">
+    <label for="&mvt:attributeID;" id="&mvt:attribute:code;-label" title="&mvte:attribute:prompt;" class="txt-label required">&mvte:attribute:prompt; (inches)</label>
+  </div>
+  <div class="column small-eleven-twelfths medium-whole large-eleven-twelfths whole">
+<mvt:else>
+  <div class="column medium-half whole">
+</mvt:if>
